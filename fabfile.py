@@ -22,6 +22,7 @@ from fabric import colors
 from fabric.state import output
 from fabric.contrib.files import exists
 
+env.name = 'MYPROJECT_ENV'
 env.hosts = []
 env.user = ''
 
@@ -102,7 +103,7 @@ def syncdb(appenv):
     Django syncdb command [see: http://docs.djangoproject.com/en/1.3/ref/django-admin/#syncdb]
     """
     with cd('%s/release' % SETTINGS[appenv]['path']):
-        run('export RADARHOTEL_ENV=%s && source %s/bin/activate && python manage.py syncdb --noinput' % (appenv, SETTINGS[appenv]['virtualenv']))
+        run('export %s=%s && source %s/bin/activate && python manage.py syncdb --noinput' % (env.name, appenv, SETTINGS[appenv]['virtualenv']))
 
 
 def _get_project_name(revision='HEAD'):
