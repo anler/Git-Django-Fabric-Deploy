@@ -9,15 +9,45 @@ or
     fab deploy production
 
 
-Django project structure:
+Development box:
+---------------
+
+The tree structure that must have the django project:
     
     myproject/
         releases/
             myproject<git-commit-id>.tar
         ...
+        config/
+            development.py
+            staging.py
+            production.py
+
+The original myproject/settings.py must be replaced by:
+    
+    import os
+
+    try:
+        environ = os.environ['MYPROJECT_ENV']
+    except KeyError:
+        environ = 'development'
+
+        configs = {
+            'development': 'development',
+            'staging': 'staging',
+            'production': 'production',
+        }
+
+        config_module = __import__('config.%s' % configs[environ], globals(), locals(), 'myproject')
+        for setting in dir(config_module):
+            if setting == setting.upper():
+                locals()[setting] = getattr(config_module, setting)
 
 
-Server app structure:
+Deployment (Production) box:
+---------------------------
+
+The structure of the project in the server:
     
     my_app/
         staging/
@@ -25,3 +55,4 @@ Server app structure:
             release     - Symbolic link to a concrete release: myproject<git-commit-id>
         production/
             ...         - Same as above
+
